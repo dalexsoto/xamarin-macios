@@ -772,6 +772,36 @@ namespace XamCore.Security {
 #endif
 		}
 
+		public SecRecord (SecCertificate certificate) : this (SecKind.Certificate)
+		{
+			SetValueRef (certificate);
+		}
+
+		public SecRecord (SecIdentity identity) : this (SecKind.Identity)
+		{
+			SetValueRef (identity);
+		}
+
+		public SecRecord (SecKey key) : this (SecKind.Key)
+		{
+			SetValueRef (key);
+		}
+
+		public SecCertificate GetCertificate ()
+		{
+			return GetValueRef <SecCertificate> ();
+		}
+
+		public SecIdentity GetIdentity ()
+		{
+			return GetValueRef<SecIdentity> ();
+		}
+
+		public SecKey GetKey ()
+		{
+			return GetValueRef<SecKey> ();
+		}
+
 		public SecRecord Clone ()
 		{
 			return new SecRecord (NSMutableDictionary.FromDictionary (queryDict));
