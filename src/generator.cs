@@ -3224,7 +3224,7 @@ public partial class Generator : IMemberGatherer {
 		string name = minfo.is_ctor ? GetGeneratedTypeName (mi.DeclaringType) : is_async ? GetAsyncName (mi) : mi.Name;
 
 		// Some codepaths already write preservation info
-		PrintAttributes (minfo.mi, preserve:!alreadyPreserved, advice:true);
+		PrintAttributes (minfo.mi, preserve:!alreadyPreserved, advice:true, bindAs:true);
 
 		if (!minfo.is_ctor && !is_async){
 			var prefix = "";
@@ -4465,7 +4465,7 @@ public partial class Generator : IMemberGatherer {
 		// we must look if the type has an [Availability] attribute
 		PrintPlatformAttributesIfInlined (minfo);
 
-		PrintAttributes (pi, preserve:true, advice:true);
+		PrintAttributes (pi, preserve:true, advice:true, bindAs:true);
 
 		string propertyTypeName;
 		if (minfo.protocolize) {
@@ -5486,16 +5486,36 @@ public partial class Generator : IMemberGatherer {
 		print ($"[NotImplemented ({Quote (p.Message)})]");
 	}
 
-	public void PrintAttributes (MemberInfo mi, bool platform = false, bool preserve = false, bool advice = false, bool notImplemented = false)
+	public void PrintBindAsAttribute (ICustomAttributeProvider mi)
+	{
+		var p = GetBindAsAttribute (mi);
+		if (p == null)
+			return;
+
+		var property = mi as PropertyInfo;
+		var method = mi as MethodInfo;
+		var param = mi as ParameterInfo;
+		var originalType = method?.ReturnType ?? property?.PropertyType;
+		originalType = originalType ?? param?.ParameterType;
+
+		var type = TypeManager.GetUnderlyingNullableType (p.Type) ?? p.Type;
+		var pReturn = method != null ? "return: " : string.Empty;
+		var pBoolean = p.IsNullable ? "?" : string.Empty;
+		print ($"[{pReturn}BindAs (typeof ({type.FullName}{pBoolean}), OriginalType = typeof ({originalType.FullName}))]");
+	}
+
+	public void PrintAttributes (ICustomAttributeProvider mi, bool platform = false, bool preserve = false, bool advice = false, bool notImplemented = false, bool bindAs = false)
 	{
 		if (platform)
-			PrintPlatformAttributes (mi);
+			PrintPlatformAttributes (mi as MemberInfo);
 		if (preserve)
 			PrintPreserveAttribute (mi);
 		if (advice)
 			PrintAdviceAttribute (mi);
 		if (notImplemented)
 			PrintNotImplementedAttribute (mi);
+		if (bindAs)
+			PrintBindAsAttribute (mi);
 	}
 
 	public void ComputeLibraryName (FieldAttribute fieldAttr, Type type, string propertyName, out string library_name, out string library_path)
