@@ -11,9 +11,11 @@ pool:
 
 steps:
 - bash: |
-    echo "hello world"
-    echo "Let's try some brew"
-    brew -v
-    echo "Set up normal Prerequisites"
+    echo "Setting up prerequisites from brew..."
     brew install libtool autoconf automake bison flex cmake
-    make world
+  displayName: "Setting up prerequisites from brew..."
+
+- bash: |
+    ./configure --enable-xamarin
+    make reset-versions
+  displayName: "Set up Xamarin-specific parts of the build"
