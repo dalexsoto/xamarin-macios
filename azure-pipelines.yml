@@ -16,3 +16,4 @@ steps:
     brew -v
     echo "Set up normal Prerequisites"
     brew install libtool autoconf automake bison flex cmake
+    make world
