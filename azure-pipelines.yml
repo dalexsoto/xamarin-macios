@@ -1,0 +1,16 @@
+# Xamarin.iOS
+# Build a Xamarin.iOS project.
+# Add steps that install certificates, test, sign, and distribute an app, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/xamarin
+
+trigger:
+- alex-devops
+
+pool:
+  vmImage: 'macOS-10.14'
+
+steps:
+- bash: |
+    echo "hello world"
+    echo "Let's try some brew"
+    brew -v
