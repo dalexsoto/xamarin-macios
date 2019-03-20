@@ -1,0 +1,56 @@
+# Xamarin.iOS
+# Build a Xamarin.iOS project.
+# Add steps that install certificates, test, sign, and distribute an app, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/xamarin
+
+trigger:
+  - alex-devops
+
+jobs:
+- job: macOS
+  displayName: xamarin macios
+  timeoutInMinutes: 120
+
+  pool:
+    vmImage: 'macOS-10.13'
+  
+  steps:
+  - task: InstallSSHKey@0
+    inputs:
+      hostName: $(github-hostname)
+      sshPublicKey: $(github-pubkey)
+      sshPassphrase: $(github-sec)
+      sshKeySecureFile: $(github-file)
+
+  - bash: |
+      echo "Setting up prerequisites from brew..."
+      brew install libtool autoconf automake bison flex
+    displayName: "Setting up prerequisites from brew..."
+
+  - task: xamops.azdevex.provisionator-task.provisionator@1
+    displayName: Provisionate devops/external-deps.csx
+    inputs:
+      provisioning_script: devops/external-deps.csx
+
+  - bash: |
+      echo "Setting up build system dependencies..."
+      ./system-dependencies.sh --provision-all
+    displayName: "Setting up build system dependencies..."
+
+  - bash: |
+      echo "Build the World..."
+      ln -sf $SYSTEM_DEFAULTWORKINGDIRECTORY $SYSTEM_DEFAULTWORKINGDIRECTORY/../xamarin-macios
+      ./configure --enable-xamarin
+      make world
+    displayName: "Build the World..."
+
+  - bash: |
+      echo "Create Packages..."
+      rm -Rf ../package
+      make package
+      cp ../package/*.* $BUILD_ARTIFACTSTAGINGDIRECTORY
+    displayName: "Create Packages..."
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      artifactName: 'macios-packages'
