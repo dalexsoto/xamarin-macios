@@ -12,7 +12,7 @@ jobs:
   timeoutInMinutes: 120
 
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: "macOS-10.13"
   
   steps:
   - task: InstallSSHKey@0
@@ -53,22 +53,23 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      artifactName: 'macios-packages'
+      artifactName: "macios-packages"
 
   - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-    displayName: 'Component Detection'
+    displayName: "Component Detection"
 
 # CredScan is Windows Only
 - job: Windows
   displayName: "CredScan - No Build"
 
   pool:
-    vmImage: 'vs2015-win2012r2'
+    vmImage: "vs2017-win2016"
 
   steps:
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
-    displayName: 'Run CredScan'
+    displayName: "Run CredScan"
     inputs:
+      suppressionsFile: "devops/CredScanSuppressions.json"
       debugMode: false
 
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
