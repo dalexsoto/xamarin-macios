@@ -60,8 +60,11 @@ jobs:
 
 # CredScan is Windows Only
 - job: Windows
+  displayName: "CredScan - No Build"
+
   pool:
     vmImage: 'vs2015-win2012r2'
+
   steps:
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
     displayName: 'Run CredScan'
