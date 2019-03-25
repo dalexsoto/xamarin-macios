@@ -24,9 +24,8 @@ jobs:
 
   - bash: |
       echo "Setting up maccore..."
-      repo=$(grep -m 1 "MACCORE_MODULE" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
-      branch=$(grep "NEEDED_MACCORE_BRANCH" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
-      git clone -b $branch $repo $SYSTEM_DEFAULTWORKINGDIRECTORY/../maccore
+      ./configure --enable-xamarin
+      make reset-maccore
     displayName: "Setting up maccore..."
 
   - bash: |
@@ -47,7 +46,6 @@ jobs:
   - bash: |
       echo "Build the World..."
       ln -sf $SYSTEM_DEFAULTWORKINGDIRECTORY $SYSTEM_DEFAULTWORKINGDIRECTORY/../xamarin-macios
-      ./configure --enable-xamarin
       make world
     displayName: "Build the World..."
 
@@ -82,9 +80,8 @@ jobs:
 
   - bash: |
       echo "Setting up maccore..."
-      repo=$(grep -m 1 "MACCORE_MODULE" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
-      branch=$(grep "NEEDED_MACCORE_BRANCH" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
-      git clone -b $branch $repo $SYSTEM_DEFAULTWORKINGDIRECTORY/../maccore
+      ./configure --enable-xamarin
+      make reset-maccore
     displayName: "Setting up maccore..."
 
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
