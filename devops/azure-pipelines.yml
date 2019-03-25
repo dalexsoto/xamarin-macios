@@ -73,13 +73,18 @@ jobs:
     vmImage: "vs2017-win2016"
 
   steps:
+  - task: InstallSSHKey@0
+    inputs:
+      hostName: $(github-hostname)
+      sshPublicKey: $(github-pubkey)
+      sshPassphrase: $(github-sec)
+      sshKeySecureFile: $(github-file)
+
   - bash: |
       echo "Setting up maccore..."
       repo=$(grep -m 1 "MACCORE_MODULE" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
       branch=$(grep "NEEDED_MACCORE_BRANCH" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
-      git -c http.extraheader="AUTHORIZATION: bearer $SYSTEM_ACCESSTOKEN" clone -b $branch $repo $SYSTEM_DEFAULTWORKINGDIRECTORY/../maccore
-    env:
-      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      git clone -b $branch $repo $SYSTEM_DEFAULTWORKINGDIRECTORY/../maccore
     displayName: "Setting up maccore..."
 
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
