@@ -23,14 +23,21 @@ jobs:
       sshKeySecureFile: $(github-file)
 
   - bash: |
+      echo "Setting up maccore..."
+      repo=$(grep -m 1 "MACCORE_MODULE" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
+      branch=$(grep "NEEDED_MACCORE_BRANCH" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
+      git clone -b $branch $repo $SYSTEM_DEFAULTWORKINGDIRECTORY/../maccore
+    displayName: "Setting up maccore..."
+
+  - bash: |
       echo "Setting up prerequisites from brew..."
       brew install libtool autoconf automake bison flex
     displayName: "Setting up prerequisites from brew..."
 
   - task: xamops.azdevex.provisionator-task.provisionator@1
-    displayName: Provisionate devops/external-deps.csx
+    displayName: Provisionate external-deps.csx
     inputs:
-      provisioning_script: devops/external-deps.csx
+      provisioning_script: $(System.DefaultWorkingDirectory)/../maccore/tools/devops/external-deps.csx
 
   - bash: |
       echo "Setting up build system dependencies..."
@@ -66,10 +73,17 @@ jobs:
     vmImage: "vs2017-win2016"
 
   steps:
+  - bash: |
+      echo "Setting up maccore..."
+      repo=$(grep -m 1 "MACCORE_MODULE" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
+      branch=$(grep "NEEDED_MACCORE_BRANCH" "$SYSTEM_DEFAULTWORKINGDIRECTORY/mk/xamarin.mk" | cut -d'=' -f2 | awk '{$1=$1};1')
+      git clone -b $branch $repo $SYSTEM_DEFAULTWORKINGDIRECTORY/../maccore
+    displayName: "Setting up maccore..."
+
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
     displayName: "Run CredScan"
     inputs:
-      suppressionsFile: "devops/CredScanSuppressions.json"
+      suppressionsFile: "$(System.DefaultWorkingDirectory)/../maccore/tools/devops/CredScanSuppressions.json"
       debugMode: false
 
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
