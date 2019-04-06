@@ -32,6 +32,7 @@ jobs:
     displayName: Provisionate external-deps.csx
     inputs:
       provisioning_script: $(System.DefaultWorkingDirectory)/../maccore/tools/devops/external-deps.csx
+      provisioning_extra_args: '-vvvv'
 
   - bash: |
       echo "Setting up build system dependencies..."
